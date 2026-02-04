@@ -74,5 +74,9 @@ docker build -t <your-registry>/fastdfs:ubuntu26arm .
 ## 注意事项
 
 - 本配置适用于 ARM 架构的 Kubernetes 集群
-- 持久化存储使用 hostPath，生产环境建议使用更可靠的存储方案
+- **存储路径**：持久化存储使用 hostPath，需要固定在某个机器上：
+  - Tracker 存储：`/data/k8s/fastdfs/tracker`
+  - Storage 存储：`/data/k8s/fastdfs/storage`
+  - 确保这些路径在指定节点上存在且有正确的权限
+- 生产环境建议使用更可靠的存储方案，如 NFS、Ceph 或云存储
 - 可根据实际需求调整存储容量和副本数
