@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-本项目提供了在 Kubernetes 环境中部署 FastDFS 的完整配置，支持 ARM 架构。
+本项目提供了在 Kubernetes 环境中部署 FastDFS 的完整配置，支持 ARM 架构，包括国产化麒麟v10等系统。
 
 ## 主要功能
 
