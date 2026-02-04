@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastdfs-storage
+  labels:
+    app: fastdfs-storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastdfs-storage
+  template:
+    metadata:
+      labels:
+        app: fastdfs-storage
+    spec:
+      containers:
+      - name: fastdfs-storage
+        image: registry.cn-hangzhou.aliyuncs.com/public_hjj_images/fastdfs:ubuntu26arm-new
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 23000
+        - containerPort: 80
+        env:
+        - name: TRACKER_SERVER
+          value: fastdfs-tracker:22122
+        - name: GROUP_NAME
+          value: group1
+        volumeMounts:
+        - name: storage-data
+          mountPath: /data/fastdfs_data
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          mkdir -p /data/fastdfs_data/logs
+          mkdir -p /data/fastdfs_data/data
+          /bin/bash /start.sh storage
+      volumes:
+      - name: storage-data
+        persistentVolumeClaim:
+          claimName: fastdfs-storage-pvc

@@ -1,0 +1,33 @@
+# FastDFS Tracker 对应的 PV（无SC，10Gi）
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: fastdfs-tracker-pv  # 唯一PV名称，与PVC对应
+spec:
+  storageClassName: ""  # 核心：空值表示无StorageClass，纯静态PV绑定
+  accessModes:
+  - ReadWriteOnce  # 与PVC的ReadWriteOnce完全匹配
+  capacity:
+    storage: 10Gi   # 与PVC的10Gi请求容量匹配
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain  # 回收策略：PVC删除后保留PV/数据（推荐）
+  hostPath:
+    path: /data/k8s/fastdfs/tracker  # 节点本地存储路径
+    type: DirectoryOrCreate  # 自动创建目录（无需手动建，避免路径不存在报错）
+---
+# FastDFS Storage 对应的 PV（无SC，100Gi）
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: fastdfs-storage-pv  # 唯一PV名称，与PVC对应
+spec:
+  storageClassName: ""  # 核心：空值表示无StorageClass
+  accessModes:
+  - ReadWriteOnce  # 与PVC的ReadWriteOnce完全匹配
+  capacity:
+    storage: 100Gi  # 与PVC的100Gi请求容量匹配
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/k8s/fastdfs/storage  # Storage独立本地路径，与Tracker区分
+    type: DirectoryOrCreate

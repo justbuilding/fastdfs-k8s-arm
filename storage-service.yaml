@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastdfs-storage
+  labels:
+    app: fastdfs-storage
+spec:
+  selector:
+    app: fastdfs-storage
+  ports:
+  - port: 23000
+    targetPort: 23000
+    protocol: TCP
+    name: storage
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: nginx
+  type: ClusterIP

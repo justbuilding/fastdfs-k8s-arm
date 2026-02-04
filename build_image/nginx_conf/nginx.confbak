@@ -1,0 +1,181 @@
+##user  nobody;
+user root;
+worker_processes  3;
+worker_rlimit_nofile 65535;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  4024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    gzip on;
+        gzip_min_length  1k;
+        gzip_buffers     4 16k;
+        gzip_http_version 1.1;
+        gzip_comp_level 2;
+        gzip_types     text/plain application/javascript application/x-javascript text/javascript text/css application/xml;
+        gzip_vary on;
+        gzip_proxied   expired no-cache no-store private auth;
+        gzip_disable   "MSIE [1-6]\.";
+
+
+        #upstream api1 {
+        #server 192.168.1.163:30000/api;
+        #}
+
+    # 说明：一般使用http_origin来进行跨域控制，当不传递origin头的时候，就为这个里面的默认值
+    # 当传递有值得时候，才会走下面得正则匹配
+
+
+#server {
+ #   listen 80;
+  #  listen [::]:80;
+   # server_name localhost;
+#
+ #   return 301 https://$host$request_uri;
+#}
+
+        server {
+    listen 80;
+        server_name  localhost;
+        index index.html;
+        root /opt/software/www/web;
+        # 其他SSL配置参数 重定向配置解析
+
+
+
+
+                # JNPF-START
+
+                #设置上传文件的大小
+                client_max_body_size 1024m;
+
+                #添加头部信息
+                proxy_set_header Cookie $http_cookie;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+ client_header_timeout 120s;
+ client_body_timeout 120s;
+
+                #请求头总长度大于128k时使用large_client_header_buffers设置的缓存区
+                client_header_buffer_size 128k;
+
+                #指令参数4为个数，128k为大小，默认是8k。申请4个128k。
+                large_client_header_buffers 4 128k;
+
+                # 前端主项目伪静态
+                location / {
+                  try_files $uri $uri/ /index.html;
+                }
+
+
+        location /group1/M00 {
+            root /data1/fastdfs/storage;
+            ngx_fastdfs_module;
+        }
+
+                # 前端大屏项目伪静态
+                location /DataV {
+                  try_files $uri $uri/ /DataV/index.html;
+                }
+
+
+                #
+
+                # 密改
+                location /Migai {
+                  proxy_pass https://19.15.47.83:443/;
+                #return 301 https://19.15.47.83:443;
+
+                }
+
+                # 数据库
+
+                # 前端报表
+                location /ReportServer/ {
+                  proxy_pass http://192.168.1.163:30000/;
+                }
+
+
+                # 前端app项目伪静态
+
+                location /yssapp {
+                    alias /opt/software/www/yssapp;
+                  try_files $uri $uri/ /yssapp/index.html;
+                  index index.html;
+                }
+
+                location /yzyapp {
+                    alias /opt/software/www/yzyapp;
+                  try_files $uri $uri/ /yzyapp/index.html;
+                  index index.html;
+                }
+
+
+                location /gmap {
+                        proxy_pass http://192.168.1.163:30014/gmap;
+                        proxy_read_timeout 600s;
+                }
+
+
+                # 请求接口配置
+                location /api {
+                        proxy_pass http://192.168.1.163:30000;
+                        #proxy_pass http://api1;
+                        #proxy_read_timeout 180s;
+                        proxy_read_timeout 600s;
+                }
+
+                # websocket
+                location /websocket {
+                  proxy_pass http://192.168.1.163:30000/api/message/websocket;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_read_timeout 600s;
+                }
+
+
+    # 文件预览服务
+    location /FileServer {
+      proxy_pass http://192.168.1.163:30090;
+    }
+
+    # 解决文件预览服务无法加载js,css问题
+    location ~ /FileServer/*.*\.(js|css)?$ {
+       proxy_pass http://192.168.1.163:30090;
+    }
+                # JNPF-END
+
+                access_log  logs/accesshttps.log;
+                error_log  logs/errorhttps.log;
+    }
+
+
+}
+

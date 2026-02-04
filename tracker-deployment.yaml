@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastdfs-tracker
+  labels:
+    app: fastdfs-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastdfs-tracker
+  template:
+    metadata:
+      labels:
+        app: fastdfs-tracker
+    spec:
+      containers:
+      - name: fastdfs-tracker
+        image: registry.cn-hangzhou.aliyuncs.com/public_hjj_images/fastdfs:ubuntu26arm
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 22122
+        volumeMounts:
+        - name: tracker-data
+          mountPath: /data/fastdfs_data
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          mkdir -p /data/fastdfs_data/logs
+          /bin/bash /start.sh tracker
+      volumes:
+      - name: tracker-data
+        persistentVolumeClaim:
+          claimName: fastdfs-tracker-pvc

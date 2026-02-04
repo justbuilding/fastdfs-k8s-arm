@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastdfs-tracker
+  labels:
+    app: fastdfs-tracker
+spec:
+  selector:
+    app: fastdfs-tracker
+  ports:
+  - port: 22122
+    targetPort: 22122
+    protocol: TCP
+  type: ClusterIP
