@@ -15,12 +15,25 @@
 
 ### 1. 创建持久化存储
 
+#### 方法一：使用静态 PV（默认）
+
 ```bash
 # 创建 PV
 kubectl apply -f pv.yaml
 
 # 创建 PVC
 kubectl apply -f pvc.yaml
+```
+
+#### 方法二：使用 StorageClass
+
+```bash
+# 创建使用 StorageClass 的 PVC
+kubectl apply -f pvc_use_storageclass.yaml
+
+# 修改部署文件，使用新的 PVC
+# 修改 tracker-deployment.yaml 中的 claimName 为 fastdfs-tracker-pvc-sc
+# 修改 storage-deployment.yaml 中的 claimName 为 fastdfs-storage-pvc-sc
 ```
 
 ### 2. 部署 FastDFS
